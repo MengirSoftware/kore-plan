@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kore Planı — Ortak Çalışma Paneli</title>
+<style>
+:root{--bg:#0f1117;--pn:#171a23;--pn2:#1e222d;--ln:#2a2f3d;--ink:#e8eaf0;--dim:#9aa2b5;--dim2:#6f7789;
+--ac:#e2725b;--ac2:#4a9d9c;--gold:#d9a94c;--blue:#5b8dd9;--ok:#5cb87a;--warn:#e0a33e;--bad:#d9604f;--p1:#5b8dd9;--p2:#c77dbb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans CJK KR",Arial,sans-serif;line-height:1.55;font-size:15px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px 80px}
+a{color:var(--blue)}
+h1{font-size:24px;margin:0 0 4px;font-weight:800;letter-spacing:-.02em}
+h1 span{color:var(--ac)}
+h2{font-size:20px;margin:28px 0 6px;font-weight:750}
+h3{font-size:16px;margin:20px 0 8px}
+p{margin:0 0 12px}
+.sub{color:var(--dim);font-size:13.5px;margin:0 0 18px}
+
+/* topbar */
+.top{position:sticky;top:0;z-index:60;background:rgba(15,17,23,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln);padding:12px 0 0}
+.toprow{max-width:1120px;margin:0 auto;padding:0 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ctrl{display:flex;align-items:center;gap:6px;background:var(--pn2);border:1px solid var(--ln);border-radius:9px;padding:5px 9px}
+.ctrl label{font-size:11px;color:var(--dim2);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+input,select,textarea{background:transparent;border:none;color:var(--ink);font:inherit;outline:none}
+input[type=date]{color-scheme:dark;font-size:13px}
+.ctrl input[type=text]{width:96px;font-size:13.5px;border-bottom:1px dashed var(--ln)}
+.btn{background:var(--pn2);border:1px solid var(--ln);color:var(--ink);border-radius:9px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--ac);color:var(--ac)}
+.btn.pri{background:var(--ac);border-color:var(--ac);color:#1a0f0c}
+.btn.pri:hover{opacity:.9;color:#1a0f0c}
+.btn.sm{padding:3px 8px;font-size:12px;border-radius:7px}
+.tabs{max-width:1120px;margin:10px auto 0;padding:0 8px;display:flex;gap:2px;overflow-x:auto}
+.tab{background:none;border:none;color:var(--dim);font:inherit;font-size:13.5px;font-weight:600;padding:11px 13px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+.tab .cnt{display:inline-block;background:var(--bad);color:#fff;font-size:10px;font-weight:800;border-radius:20px;padding:0 6px;margin-left:5px;vertical-align:middle}
+.tab .cnt.zero{background:var(--ok);color:#08210f}
+section.pg{display:none;padding-top:22px}
+section.pg.on{display:block}
+
+/* day card */
+.day{background:var(--pn);border:1px solid var(--ln);border-radius:13px;margin:12px 0;overflow:hidden}
+.day.bad{border-color:rgba(217,96,79,.55)}
+.dh{display:flex;align-items:center;gap:13px;padding:13px 15px;cursor:pointer;user-select:none}
+.dh:hover{background:var(--pn2)}
+.dn{flex:none;width:52px;text-align:center;border-radius:10px;background:var(--pn2);border:1px solid var(--ln);padding:5px 0;line-height:1.15}
+.dn b{display:block;font-size:17px;color:var(--ac);font-weight:800}
+.dn small{display:block;font-size:9px;color:var(--dim2);letter-spacing:.06em}
+.dt{flex:1;min-width:0}
+.dt .ti{font-weight:700;font-size:15.5px}
+.dt .mt{color:var(--dim);font-size:12.5px;margin-top:2px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.wd{font-weight:700;color:var(--ac2)}
+.wd.mon{color:var(--bad)}
+.city{background:var(--pn2);border:1px solid var(--ln);border-radius:20px;padding:1px 9px;font-size:11.5px}
+.dbadge{background:rgba(217,96,79,.16);color:#ec8878;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700}
+.car{color:var(--dim2);font-size:12px;transition:.2s}
+.day.op .car{transform:rotate(90deg)}
+.db{display:none;border-top:1px solid var(--ln);padding:12px 15px 16px}
+.day.op .db{display:block}
+
+.blk{margin:12px 0 4px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);font-weight:800}
+.it{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--ln)}
+.it:last-child{border-bottom:none}
+.it.shut{background:rgba(217,96,79,.06);border-radius:8px;padding:8px 8px;border-bottom:none;margin-bottom:2px}
+.itm{flex:1;min-width:0}
+.tm{width:56px;flex:none;font-size:12.5px;color:var(--ac2);font-weight:700;border-bottom:1px dashed transparent}
+.tm:focus{border-bottom-color:var(--ln)}
+.nm{width:100%;font-size:14.5px;font-weight:600;border-bottom:1px dashed transparent;padding:1px 0}
+.nm:focus{border-bottom-color:var(--ln)}
+.nt{width:100%;font-size:12.5px;color:var(--dim);border-bottom:1px dashed transparent;padding:1px 0}
+.nt:focus{border-bottom-color:var(--ln)}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.tag{font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 7px}
+.t-free{background:rgba(92,184,122,.15);color:#7ed49a}
+.t-rez{background:rgba(91,141,217,.16);color:#8ab0e8}
+.t-shut{background:rgba(217,96,79,.16);color:#ec8878}
+.t-warn{background:rgba(224,163,62,.16);color:#e8bd6e}
+.own{border:1px solid var(--ln);background:var(--pn2);color:var(--dim);border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700;cursor:pointer}
+.own.o1{border-color:var(--p1);color:var(--p1)}
+.own.o2{border-color:var(--p2);color:var(--p2)}
+.own.o3{border-color:var(--ok);color:var(--ok)}
+.cost{width:74px;font-size:12px;text-align:right;color:var(--gold);font-weight:700;border-bottom:1px dashed var(--ln)}
+.acts{flex:none;display:flex;gap:3px;opacity:.45}
+.it:hover .acts{opacity:1}
+.ib{background:none;border:1px solid var(--ln);color:var(--dim);border-radius:6px;width:24px;height:24px;font-size:12px;cursor:pointer;padding:0;line-height:1}
+.ib:hover{color:var(--ac);border-color:var(--ac)}
+.ib.del:hover{color:var(--bad);border-color:var(--bad)}
+
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:13px;padding:18px;margin:14px 0}
+.note{border-left:3px solid var(--ac2);background:rgba(74,157,156,.07);padding:11px 14px;border-radius:0 9px 9px 0;margin:12px 0;font-size:13.8px}
+.note.w{border-color:var(--warn);background:rgba(224,163,62,.08)}
+.note.b{border-color:var(--bad);background:rgba(217,96,79,.08)}
+.note.g{border-color:var(--ok);background:rgba(92,184,122,.08)}
+.note.s{border-color:var(--gold);background:rgba(217,169,76,.08)}
+.nt-t{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;color:var(--ac2)}
+.note.w .nt-t{color:var(--warn)}.note.b .nt-t{color:var(--bad)}.note.g .nt-t{color:var(--ok)}.note.s .nt-t{color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--ln);vertical-align:top}
+th{background:var(--pn2);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.tw{overflow-x:auto}
+.won{color:var(--gold);font-weight:700}
+ul.cl{padding-left:18px;margin:8px 0}ul.cl li{margin-bottom:6px}ul.cl li::marker{color:var(--ac)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--ln)}
+.chk:last-child{border-bottom:none}
+.chk input[type=checkbox]{margin-top:4px;width:16px;height:16px;accent-color:var(--ac);cursor:pointer;flex:none}
+.chk .lb{flex:1;font-size:14px}
+.chk.done .lb{color:var(--dim2);text-decoration:line-through}
+.when{display:inline-block;font-size:10.5px;font-weight:800;color:var(--ac2);background:rgba(74,157,156,.12);padding:1px 7px;border-radius:5px;margin-right:6px}
+.gr{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.stat{background:var(--pn);border:1px solid var(--ln);border-radius:11px;padding:14px 16px}
+.stat .n{font-size:21px;font-weight:800;color:var(--ac);line-height:1.1}
+.stat .l{color:var(--dim);font-size:12px;margin-top:3px}
+textarea.big{width:100%;min-height:220px;background:var(--pn);border:1px solid var(--ln);border-radius:11px;padding:14px;font-size:14px;line-height:1.6;resize:vertical}
+.bl{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--ln);align-items:center}
+.bl:last-child{border-bottom:none}
+.bl .bn{flex:1;font-size:13.5px}
+.bl input.bv{width:120px;text-align:right;font-size:13.5px;color:var(--gold);font-weight:700;border-bottom:1px dashed var(--ln)}
+.tot{display:flex;justify-content:space-between;padding:12px 0 0;margin-top:6px;border-top:2px solid var(--ln);font-size:16px;font-weight:800}
+.gate{position:fixed;inset:0;background:rgba(12,14,19,.97);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.gatebox{width:100%;max-width:380px;background:var(--pn);border:1px solid var(--ln);border-radius:16px;padding:26px}
+.glab{display:block;font-size:11px;color:var(--dim2);letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin:12px 0 4px}
+.ginp{width:100%;background:var(--pn2);border:1px solid var(--ln);border-radius:9px;padding:9px 11px;font-size:14px;color:var(--ink)}
+.ginp:focus{border-color:var(--ac)}
+.whobtn{font-size:13.5px;padding:8px 10px}
+.whobtn.on{border-color:var(--ac);color:var(--ac);background:rgba(226,114,91,.1)}
+.gerr{display:none;margin-top:12px;background:rgba(217,96,79,.12);border-left:3px solid var(--bad);color:#ec8878;padding:9px 12px;border-radius:0 8px 8px 0;font-size:13px}
+.syncrow{max-width:1120px;margin:10px auto 0;padding:8px 16px;display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  background:var(--pn2);border:1px solid var(--ln);border-radius:10px}
+.sdot{width:9px;height:9px;border-radius:50%;flex:none}
+.sdot.on{background:var(--ok);box-shadow:0 0 0 3px rgba(92,184,122,.18)}
+.sdot.off{background:var(--dim2)}
+.mergebar{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:var(--warn);color:#231603;
+  padding:9px 14px;border-radius:10px;font-size:13.5px;font-weight:600;z-index:98;display:flex;gap:9px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.mergebar .btn{background:rgba(0,0,0,.15);border-color:rgba(0,0,0,.25);color:#231603}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ok);color:#07200e;padding:10px 18px;border-radius:10px;font-weight:700;font-size:14px;z-index:99;opacity:0;pointer-events:none;transition:.25s}
+.toast.on{opacity:1}
+.hint{color:var(--dim2);font-size:12px}
+@media(max-width:620px){.dh{padding:11px 11px;gap:10px}.db{padding:10px 11px 14px}.it{flex-wrap:wrap}.tm{width:48px}.acts{margin-left:auto}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="toprow">
+    <div style="flex:1;min-width:200px">
+      <h1>Kore <span>Ortak Panel</span></h1>
+      <div class="hint" id="rangeTxt">13 gün · 12 gece</div>
+    </div>
+    <div class="ctrl"><label>Başlangıç</label><input type="date" id="startDate"></div>
+    <div class="ctrl"><label>Kişi 1</label><input type="text" id="p1n"></div>
+    <div class="ctrl"><label>Kişi 2</label><input type="text" id="p2n"></div>
+    <button class="btn pri" id="bSave">Kaydet (.json)</button>
+    <button class="btn" id="bLoad">Yükle</button>
+    <button class="btn" id="bCode">Kod kopyala</button>
+    <button class="btn" id="bPaste">Kod yapıştır</button>
+    <button class="btn" id="bReset">Sıfırla</button>
+    <input type="file" id="fIn" accept=".json,application/json" style="display:none">
+  </div>
+  <div class="syncrow" id="syncbar"></div>
+  <div class="tabs">
+    <button class="tab on" data-p="plan">Plan</button>
+    <button class="tab" data-p="uyari">Uyarılar <span class="cnt" id="wc">0</span></button>
+    <button class="tab" data-p="rez">Rezervasyon</button>
+    <button class="tab" data-p="butce">Bütçe</button>
+    <button class="tab" data-p="not">Notlar</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="pg on" id="plan">
+    <div class="note s"><span class="nt-t">★ Nasıl kullanılır</span>
+      Her alan doğrudan yazılabilir — saat, başlık, not, ücret. <b>Kişi rozetine tıklayarak</b> o işi birinize atayın (— → Kişi 1 → Kişi 2 → İkisi).
+      <b>Başlangıç tarihini</b> yukarıdan seçin: sistem her günün hangi haftanın gününe düştüğünü hesaplar ve <b>kapalı olan mekânları kırmızıya boyar</b>.
+      Bittiğinde <b>Kaydet (.json)</b> ile dosyayı indirip WhatsApp'tan arkadaşına yolla; o da <b>Yükle</b> ile açsın.
+    </div>
+    <div id="days"></div>
+    <div class="note"><span class="nt-t">Eklemeyi düşünebileceğin tek şey</span>
+      <b>Namhansanseong</b> (남한산성) — UNESCO, 1636 Mançu kuşatmasının yaşandığı dağ kalesi, 12 km sur. 8. hat Sanseong İst. + otobüs, Seul’den ~1 saat. Karla kaplı hâli çok etkileyici ama <b>tam gün ister</b>, o yüzden plana koymadım. Gün 4 veya Gün 6’yı feda etmeye razıysan en güçlü kale adayı bu.
+    </div>
+  </section>
+
+  <section class="pg" id="uyari"></section>
+  <section class="pg" id="rez"></section>
+  <section class="pg" id="butce"></section>
+  <section class="pg" id="not">
+    <h2>Ortak notlar</h2>
+    <p class="sub">Buraya yazdığınız her şey kaydettiğiniz dosyaya girer.</p>
+    <textarea class="big" id="notes" placeholder="Otel linkleri, rezervasyon numaraları, yemek listesi, birbirinize notlar..."></textarea>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const WD=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+const WS=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+
+function D(n,title,sub,city,items,note){return{n,title,sub,city,items,note:note||'',open:n<=1}}
+function I(t,name,o){o=o||{};return{t,name,note:o.note||'',cl:o.cl||null,clN:o.clN||null,tag:o.tag||'',cost:o.cost||0,own:0,tip:o.tip||''}}
+
+function baseData(){return{
+ v:3, startDate:'', p1:'Oğuzhan', p2:'Cem', notes:'',
+ budget:{ucak:0, otelSeul:630000, otelBusan:320000, otelSon:90000, ktx1:119600, ktx2:119600, yemek:1040000, ulasim:180000, ekstra:0},
+ rez:{},
+ days:[
+  D(1,'Seul’e varış','Hafif başlangıç — Jongno / Euljiro','Seul',[
+    I('Sabah','Incheon → Seul',{note:'AREX Express 43 dk ₩11.000 · All-stop ~60 dk ₩4.750 · Limuzin otobüs ₩17.000 (bavulla en rahatı)',cost:11000}),
+    I('Sabah','Otele yerleşme + T-money kart',{note:'Markette ₩2.500–4.000. İkiniz de ayrı kart alın. WOWPASS alternatifi: hem döviz bozar hem T-money.',cost:4000}),
+    I('Öğle','Cheonggyecheon boyunca yürüyüş',{tag:'free'}),
+    I('Öğle','Gwangjang Pazarı',{note:'Akşam 19:00–23:00 yerel vardiya. ⚠ Sipariş öncesi yazılı fiyatı gör (2025 fiyat skandalı).',tip:'Pazartesi tezgâhların çoğu kapalı',cost:15000}),
+    I('Akşam','Ikseon-dong veya Jongno 3-ga',{note:'Pojangmacha çadırları kışın ısıtmalı ve naylonla kapalı.',cost:20000})
+  ],'Uçuş sonrası günü hafif tut. İstanbul–Seul +6 saat.'),
+
+  D(2,'Gyeongbokgung, Seochon, Bukchon','Joseon başkentinin çekirdeği','Seul',[
+    I('09:00','Gyeongbokgung Sarayı',{cl:[2],note:'Kış 09:00–17:00, son giriş 16:00. Hanbok kiralarsanız ikinize de giriş ücretsiz.',cost:3000}),
+    I('10:00','Nöbet değişimi töreni',{note:'10:00 ve 14:00. Sarayın ana kapısında.',tag:'free'}),
+    I('11:00','Ulusal Halk Müzesi',{cl:[1],tag:'free',note:'Saray arazisinin içinde, ayrı ücret yok.'}),
+    I('12:00','Tongin Market — yeopjeon lunchbox',{cl:[1],note:'Pirinç parayla tepsi doldurma. 11:00–16:00. Ayın 3. Pazarı da kapalı.',cost:6000}),
+    I('13:30','Seochon sokakları',{tag:'free',note:'Daeo Kitabevi (1951), Sejong Köyü Yemek Sokağı.'}),
+    I('14:30','Bukchon Hanok Köyü — kısa geçiş',{tag:'free',note:'Yerleşim bölgesi: sessiz olun, 17:00 sonrası gitmeyin.'}),
+    I('15:45','Jongmyo Tapınağı',{cl:[2],tag:'rez',cost:1000,note:'✎ DÜZELTME: Gün 3’ten buraya taşındı. Sebep: Gizli Bahçe ile aynı güne iki saatli rezervasyon sığdırmak riskliydi. Burası coğrafi olarak da doğru — Jongno 3-ga’nın hemen yanında, akşam programına doğal geçiş. ⚠ Cumartesi ve ayın son Çarşambası dışında sadece saatli rehberli turla giriliyor; son turun saatini önceden öğren.'}),
+    I('18:30','Jongno 3-ga arka sokakları',{cost:20000})
+  ],'Gyeongbokgung ve Jongmyo ikisi de Salı kapalı — bu gün Salı olamaz.'),
+
+  D(3,'Changdeokgung, Jongmyo, Changgyeonggung','Saraylar ve kraliyet ritüelleri','Seul',[
+    I('09:00','Changdeokgung Sarayı',{cl:[1],cost:3000}),
+    I('10:00','Gizli Bahçe (Huwon) turu',{cl:[1],tag:'rez',cost:5000,note:'⚠ Saatli ve kontenjanlı. Online rezervasyon şart, hafta sonu erken doluyor. İki kişilik yer ayırt.'}),
+    I('13:00','Changgyeonggung Sarayı',{cl:[1],cost:1000,note:'Changdeokgung ile arasında geçiş kapısı var — dışarı çıkmadan geçiliyor.'}),
+    I('15:00','Unhyeongung Sarayı',{cl:[1],tag:'free',note:'✎ EKLENDİ: Jongmyo Gün 2’ye taşınınca boşalan yeri doldurmak için. Anguk İst., Changdeokgung’a 5 dk. Kral Gojong’un çocukluğunun geçtiği konak — küçük, ücretsiz ve neredeyse boş.'}),
+    I('16:30','Ikseon-dong veya Daehangno',{cost:20000})
+  ],'Bu günün saatini Gizli Bahçe rezervasyonu belirler. Changdeokgung, Changgyeonggung ve Unhyeongung Pazartesi kapalı — bu gün Pazartesi olamaz.'),
+
+  D(4,'Yongin Mobility Museum','Klasik otomobiller ve ulaşım tarihi','Yongin',[
+    I('08:30','Seul → Yongin',{note:'Giheung İst. (Suin-Bundang/Everline) → Jeondae·Everland İst. → otobüs/taksi. Metro yok, son bölüm taksi. İki kişi olunca taksi ucuz.',cost:6000}),
+    I('10:00','Samsung Fire & Marine Mobility Museum',{cl:[1],cost:10000,note:'Lee Kun-hee koleksiyonu. 60+ klasik araç: 1923 Rolls-Royce, Mercedes 300 SL’ler, DeLorean, Hyundai Pony, Benetton F1. Hafta içi 09:00–17:00, hafta sonu 10:00–18:00. Everland biletiyle %50 indirim.'}),
+    I('13:30','Kore Halk Köyü (Yongin)',{cl:[],cost:32000,note:'★ ÖNERİM — planında yok. Aynı ilçede, müzeye ~30 dk. 270 gerçek geleneksel yapı, yangban konağı, valilik binası, geleneksel gösteriler. "Kale ve tarih" isteğine tam oturuyor ve Gün 4’ün boş kalan yarısını doldurur. İstemezsen sil.'}),
+    I('18:00','Seul’e dönüş + Euljiro akşamı',{cost:20000,note:'Euljiro 3-ga Çıkış 4. Nogari Sokağı: kurutulmuş yavru mezgit ₩1.000/adet.'})
+  ],'Müze tek başına ~2,5 saat sürer; Yongin’e gidip dönmek tam gün eder. Halk Köyü eklemezsen bu gün yarım kalır.'),
+
+  D(5,'Samsung Innovation Museum ve Hwaseong','Günübirlik teknoloji ve kale rotası','Suwon',[
+    I('09:00','Seul → Suwon',{note:'1. hat metro 53 dk ₩2.100 · ITX 31 dk ₩4.800',cost:2100}),
+    I('10:00','Samsung Innovation Museum',{cl:[0],tag:'rez',note:'ÜCRETSİZ. 10:00–17:00, son giriş 16:00. ⚠ Hafta içi en az 3 gün önceden rezervasyon; CUMARTESİ randevusuz giriliyor. Pazar kapalı. 13 yaş üstü.'}),
+    I('12:45','Hwaseong Haenggung',{cost:1500}),
+    I('13:45','Paldalmun → Seojangdae → Hwaseomun',{tag:'free',note:'✎ DÜZELTME: saatler öne çekildi. Surların en iyi bölümü. Tam tur 5,7 km / ~3 saat; siz batı+kuzeyi yürüyeceksiniz.'}),
+    I('15:15','Janganmun → Hwahongmun → Banghwasuryujeong',{tag:'free',note:'✎ DÜZELTME: akşam bloğundan öğleden sonraya alındı. Sebep: kışın 17:30’da karanlık ve sur yolu buzlanıyor — bu bölümü gün ışığında bitirmelisiniz.'}),
+    I('17:00','Ankara Parkı',{tag:'free',note:'Suwon–Ankara kardeş şehir parkı, kaleye yürüme mesafesinde.'}),
+    I('18:00','Jidong Pazarı’nda akşam yemeği',{cost:15000,note:'Karanlık bastıktan sonrası artık kapalı mekân — doğru sıralama bu.'})
+  ],'Bu günü CUMARTESİ’ye getirirsen Samsung’a randevusuz girersin — tek hamlede rezervasyon derdi biter.'),
+
+  D(6,'Hyundai Motorstudio günü','İki şube — Apgujeong ve Goyang','Seul / Goyang',[
+    I('09:30','Hyundai Motorstudio Seoul — Auto Library',{clN:{wd:1,nth:1},tag:'free',note:'Apgujeong Rodeo İst. (Suin-Bundang). 09:00–21:00, ücretsiz. Tsutaya küratörlüğünde 2.500 otomotiv kitabı + 500 obje, aralarında nadir dönem katalogları — oturup okuyabilirsiniz, kafe var. 4. kat IONIQ döküm model duvarı. ✎ Kia360 çıkarıldığı için buraya 2,5 saat ayırdım. Ayın 1. Pazartesi’si kapalı.'}),
+    I('12:30','Seul İstasyonu’na geç, GTX-A’ya bin',{cost:5000,note:'⚠ Apgujeong’dan Seoul İstasyonu’na ~30–35 dk. GTX-A’nın Samseong durağı henüz açılmadı, o yüzden Seoul İstasyonu üzerinden gidiyorsunuz. Gitmeden hattı bir kontrol edin.'}),
+    I('14:00','★ Hyundai Motorstudio Goyang — kalıcı sergi',{cl:[1],cost:10000,note:'✎ EKLENDİ (Kia360 yerine). Dört şube içinde EN BÜYÜĞÜ ve tek ücretlisi — asıl kalıcı sergi alanı burası, Apgujeong’daki kütüphane ağırlıklı. GTX-A Kintex İst. Çıkış 1. Sergi 10:00–18:20 (hafta sonu 19:00). Bilet ₩10.000; 4D ride’ı almayın, gereksiz. ⚠ HER PAZARTESİ KAPALI — bu, takvimi etkiliyor, Uyarılar sekmesine bak.'}),
+    I('17:30','Dönüş — Seongsu veya Eungbongsan',{tag:'free',note:'Vaktiniz kalırsa Seongsu’nun arka sokakları (hâlâ çalışan ayakkabı fabrikaları ve matbaalar) ya da Eungbongsan’dan gece manzarası: 15 dk tırmanış, Han virajı + Lotte World Tower + Namsan tek karede.'})
+  ],'✎ DÜZELTİLDİ: Kia360 ve Dosan Park çıkarıldı, yerine Motorstudio Goyang eklendi. ⚠ Gün iki uçtan uca (Apgujeong güneydoğu, Goyang kuzeybatı) — Goyang’ı istemezseniz silin, o zaman Apgujeong + Seongsu rahat bir yarım gün olur.'),
+
+  D(7,'Batı surları ve modern tarih','DMZ yerine derinleştirilmiş Seul günü','Seul',[
+    I('09:45','Seodaemun Hapishanesi Tarih Salonu',{cl:[1],cost:3000,note:'Kış 09:30–17:00. 1908–1945 Japon sömürge hapishanesi, sonra 1987’ye kadar siyasi hapishane.'}),
+    I('11:30','Dongnimmun',{tag:'free'}),
+    I('12:30','Inwangsan sur hattı veya Ansan Jarak-gil',{tag:'free',note:'Ansan Jarak-gil: 7 km dairesel ahşap platform, buz riski minimum — Seul’ün en güvenli kış yürüyüşü. Inwangsan’da Guksadang şaman tapınağı da var (ücretsiz, aktif ibadet yeri).'}),
+    I('15:00','Donuimun Museum Village',{cl:[1],tag:'free'}),
+    I('16:30','Deoksugung ve taş duvar yolu',{cl:[1],cost:1000,note:'Deoksugung 21:00 tarihine kadar açık — kış akşamı aydınlatması güzel.'}),
+    I('18:30','Namdaemun çevresi',{cost:15000,note:'Yachae hotteok: içi cam erişte ve sebze dolu tuzlu gözleme, ~₩2.500.'})
+  ],'Patika buzluysa yürüyüşü Donuimun–Deoksugung hattına çevir.'),
+
+  D(8,'Tarihî liman ve savaş hafızası','Sabah erken KTX — Busan 1. gün','Busan',[
+    I('07:30','KTX Seul → Busan',{cost:59800,tag:'rez',note:'~2 sa 40 dk. Seoul İstasyonu’ndan. İki kişilik yan yana koltuk için önceden al. letskorail.com İngilizce, yabancı kart kabul ediyor.'}),
+    I('11:00','Seomyeon’daki otele bavul bırakma',{tag:'free'}),
+    I('13:00','BM Anıt Mezarlığı ve Türk bölümü',{tag:'free',note:'Dünyadaki tek BM anıt mezarlığı. Kore Savaşı’nda ölen 462 Türk askeri burada. Nöbet değişimi töreni var.'}),
+    I('15:00','Busan Müzesi',{cl:[1],tag:'free',note:'Mezarlığın hemen yanında. Liman ve savaş dönemi tarihi.'}),
+    I('17:00','40 Basamak',{tag:'free',note:'Kore Savaşı’nda ailelerin buluşma noktası, şimdi anıt.'}),
+    I('18:00','Bosu-dong Kitapçılar Sokağı, Nampo, Jagalchi',{cost:25000,note:'Bosu-dong: mültecilerin kurduğu sokaktan kalan ~50 sahaf. Jagalchi’de kışın istiridye sezonu — masa ücretini (sangchari) sipariş öncesi netleştir.'})
+  ],'İlk trenlerden birini kullanırsan günün büyük bölümü Busan’a kalır.'),
+
+  D(9,'Kale, tapınak ve F1963','Busan 2. tam gün','Busan',[
+    I('09:00','Beomeosa Tapınağı',{tag:'free',note:'678 yılı. 1. hat Beomeosa İst. + 90 numaralı otobüs. Dağın yamacında, kışın çok sakin.'}),
+    I('11:00','Geumjeongsanseong — Kuzey Kapısı',{tag:'free',note:'★ ÖNERİM — planında yok. Beomeosa’nın hemen üstünde, tapınaktan patikayla ~40 dk. 17 km surla KORE’NİN EN BÜYÜK DAĞ KALESİ. "Kale" isteğine en çok oturan yer ve zaten oradasın. Yürümek istemezsen Kuzey Kapısı’na taksiyle de çıkılıyor.'}),
+    I('13:30','Dongnae Eupseong Kalesi',{tag:'free',note:'1592 Japon istilasında düşen kale — Busan’ın savaş hafızasının başladığı yer. Dongnae İst. Chungnyeolsa (şehitlik) tam yanında, 20 dakikanız varsa uğrayın.'}),
+    I('15:30','F1963 kültür kompleksi',{tag:'free',note:'1963 Kiswire çelik tel fabrikası → kültür merkezi. İçinde Kiswire Müzesi, kitapçı, bira fabrikası, galeri.'}),
+    I('16:30','Hyundai Motorstudio Busan',{clN:{wd:1,nth:1},tag:'free',note:'F1963’ün içinde, ayrı yere gitmiyorsunuz. 10:00–20:00.'}),
+    I('18:30','Gwangalli ve köprü manzarası',{cost:25000,note:'Belediye düzenli drone gösterisi yapıyor (genelde Cumartesi) — visitbusan.net’ten takvime bak.'})
+  ],'✎ DÜZELTİLDİ: Chungnyeolsa ayrı durak olmaktan çıkarılıp Dongnae’ye iliştirildi ve saatler gevşetildi. Sebep: Beomeosa en kuzeyde, Gwangalli en doğuda ve kışın 17:30’da karanlık — 7 duraklı hâli sığmıyordu.'),
+
+  D(10,'Silla şehir merkezi','Busan’dan günübirlik — Gyeongju 1. gün','Gyeongju',[
+    I('08:00','Busan → Gyeongju',{cost:11000,note:'Nopo Terminali’nden otobüs ~1 saat. Gyeongju Şehirlerarası Terminali’ne varır.'}),
+    I('10:00','Daereungwon ve Cheonmachong',{cost:3000,note:'23 dev çim höyük; Cheonmachong içeriden geziliyor — altın taç ve gök at eyer süsü.'}),
+    I('11:30','Cheomseongdae ve Gyerim',{tag:'free',note:'7. yy — Doğu Asya’da ayakta duran en eski gözlemevi. 362 taş.'}),
+    I('12:15','Wolseong (Ay Kalesi) ve Seokbinggo',{tag:'free',note:'★ ÖNERİM — planında yok, tam yol üstünde ve ücretsiz. Silla saray kalesinin toprak surları + 18. yy buz deposu. "Kale" temanı Gyeongju’ya taşıyor.'}),
+    I('14:00','Gyeongju Ulusal Müzesi',{cl:[1],tag:'free',note:'Silla altın işçiliği, Emille Çanı (~19 ton). ⚠ Kapanış gününü teyit et.'}),
+    I('16:30','Woljeonggyo Köprüsü',{tag:'free',note:'Yeniden inşa edilmiş Silla ahşap köprüsü, akşam aydınlatmalı.'}),
+    I('17:45','Donggung Sarayı ve Wolji — karanlıkta',{cost:3000,note:'Kışın 17:30’da karardığı için 18:00 tam kıvamında. Yazın 21:00’i beklemen gerekirdi.'}),
+    I('20:00','Busan’a dönüş',{cost:11000,note:'⚠ Gyeongju→Busan son otobüs saatini GİDERKEN öğren. Wolji’den terminale ~15 dk.'})
+  ],'Gyeongju tek güne inerse korunacak çekirdek program budur.'),
+
+  D(11,'Bulguksa ve Seokguram','Busan’dan günübirlik — Gyeongju 2. gün','Gyeongju',[
+    I('08:00','Busan → Gyeongju → Bulguksa',{cost:12000,note:'⚠ Doğrudan Bulguksa’ya giden bağlantı yok: önce Gyeongju terminaline (~1 sa), oradan 10/11 numaralı otobüs (~40 dk). Bulguksa’ya ancak 10:30 gibi varırsın.'}),
+    I('09:45','Bulguksa ve taş pagodalar',{tag:'free',note:'751 yılı. Dabotap ve Seokgatap — ikisi de milli hazine. Mayıs 2023’te devlet arazisindeki 65 tapınakta giriş ücreti kaldırıldı, Bulguksa kapsamdaydı; yine de teyit et.'}),
+    I('11:30','Seokguram Grottosu',{cost:6000,note:'Taksiyle gidiyorsanız sorun yok. ⚠ Otobüsle giderseniz: Bulguksa’dan 12 numara, ~20 dk, kışın seferler seyrek — çıkarken dönüş saatini mutlaka not edin. Heykel cam arkasından izleniyor, içeri girilmiyor, fotoğraf yasak.'}),
+    I('14:00','Hwangnyongsa kalıntıları veya Bomun Gölü',{tag:'free',note:'Hwangnyongsa: 9 katlı ~80 m ahşap pagodadan kalan temel taşları, 1238’de Moğollar yaktı. Yanında dijital canlandırma merkezi.'}),
+    I('16:30','Busan’a dönüş + Seomyeon’da akşam',{cost:11000})
+  ],'Opsiyonel ikinci gün. ⚠ İki gün üst üste Busan–Gyeongju günübirliği yorucu (günde ~2,5 saat yol). Alternatif: Busan otelini bozmadan Gyeongju’da 1 gece küçük çantayla kalın — Wolji’yi akşam, Bulguksa’yı ertesi sabah dinlenmiş görürsünüz.'),
+
+  D(12,'Busan’dan Seul’e dönüş','Son gece — esnek şehir programı','Seul',[
+    I('09:00','Busan’da sakin kahvaltı',{cost:10000}),
+    I('11:00','KTX ile Seul’e dönüş',{cost:59800,tag:'rez',note:'~2 sa 40 dk. Alternatif: Gimhae → Gimpo uçuşu ~1 saat, erken alınırsa benzer fiyat.'}),
+    I('14:30','Gongdeok veya Hongdae’ye yerleşme',{note:'AREX ile Incheon’a doğrudan bağlantı — uçuş sabahı için doğru karar.'}),
+    I('16:00','Culture Station Seoul 284',{cl:[1],tag:'free',note:'1925 Seoul İstasyonu binası, restore edilmiş, ücretsiz sergiler. Seoul İst. Çıkış 1.'}),
+    I('18:30','Namdaemun veya Mangwon’da son yemek',{cost:25000}),
+    I('21:00','Bavul ve uçuş hazırlığı',{})
+  ],'Tren saatine göre yalnızca bir kısa şehir durağı seçin.'),
+
+  D(13,'Seul finali ve dönüş','Uçuş saatine göre esnek','Seul',[
+    I('09:30','Kore Savaş Anıtı — Türk Tugayı bölümü',{cl:[1],tag:'free',note:'★ Uçuş günü için doğru seçim: Samgakji İst. (4/6. hat) Çıkış 12, Gongdeok/Hongdae’ye yakın. Dışarıda açık hava uçak/tank sergisi.'}),
+    I('13:00','AREX veya havalimanı otobüsü',{cost:11000,note:'Seoul İstasyonu’nda şehir içi check-in yapılabiliyor (bazı havayolları).'}),
+    I('16:00','Incheon’da check-in',{}),
+    I('19:00','Türkiye’ye dönüş',{})
+  ],'✎ DÜZELTİLDİ: Robot & AI Müzesi alternatifi kaldırıldı. Sebep: Changdong, Gongdeok/Hongdae’den metroyla 50–60 dk ve rezervasyon zorunlu — uçuş günü sabahına uygun değil. Görmek isterseniz Gün 6 veya 7’ye taşıyın. Erken uçuşta şehir programı ekleme, doğrudan havalimanına git.')
+ ]
+}}
+
+let S = baseData();
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+
+/* ---------- tarih ---------- */
+function dateOf(n){ if(!S.startDate) return null; const d=new Date(S.startDate+'T12:00:00'); d.setDate(d.getDate()+(n-1)); return d; }
+function nthWd(d){ return Math.ceil(d.getDate()/7); }
+function fmt(d){ return d.getDate()+' '+['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'][d.getMonth()]; }
+
+function itemShut(it,d){
+  if(!d) return false;
+  if(it.cl && it.cl.includes(d.getDay())) return true;
+  if(it.clN && d.getDay()===it.clN.wd && nthWd(d)===it.clN.nth) return true;
+  return false;
+}
+function allWarnings(){
+  const out=[];
+  S.days.forEach((day,di)=>{
+    const d=dateOf(day.n);
+    day.items.forEach((it,ii)=>{
+      if(itemShut(it,d)) out.push({day:day.n,dt:d,name:it.name,title:day.title,kind:'kapali'});
+    });
+  });
+  return out;
+}
+
+/* ---------- yardımcı ---------- */
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1900);}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function money(v){return '₩'+(v||0).toLocaleString('tr-TR');}
+
+/* ---------- render: plan ---------- */
+function renderDays(){
+  const host=$('#days'); host.innerHTML='';
+  S.days.forEach((day,di)=>{
+    const d=dateOf(day.n);
+    const shuts=day.items.filter(it=>itemShut(it,d)).length;
+    const el=document.createElement('div');
+    el.className='day'+(day.open?' op':'')+(shuts?' bad':'');
+    let head='<div class="dh" data-t="'+di+'">'
+      +'<div class="dn"><small>GÜN</small><b>'+day.n+'</b></div>'
+      +'<div class="dt"><div class="ti">'+esc(day.title)+'</div><div class="mt">'
+      + (d?'<span class="wd'+(d.getDay()===1?' mon':'')+'">'+WD[d.getDay()]+' · '+fmt(d)+'</span>':'<span class="hint">tarih seçilmedi</span>')
+      + '<span class="city">'+esc(day.city)+'</span>'
+      + (shuts?'<span class="dbadge">'+shuts+' KAPALI</span>':'')
+      + '<span class="hint">'+esc(day.sub)+'</span>'
+      +'</div></div><div class="car">▶</div></div>';
+    let body='<div class="db">';
+    day.items.forEach((it,ii)=>{
+      const sh=itemShut(it,d);
+      body+='<div class="it'+(sh?' shut':'')+'">'
+       +'<input class="tm" value="'+esc(it.t)+'" data-p="days.'+di+'.items.'+ii+'.t">'
+       +'<div class="itm">'
+         +'<input class="nm" value="'+esc(it.name)+'" data-p="days.'+di+'.items.'+ii+'.name">'
+         +'<input class="nt" value="'+esc(it.note)+'" placeholder="not ekle…" data-p="days.'+di+'.items.'+ii+'.note">'
+         +'<div class="meta">'
+           + (sh?'<span class="tag t-shut">✕ '+WD[d.getDay()]+' KAPALI</span>':'')
+           + (it.tag==='free'?'<span class="tag t-free">ÜCRETSİZ</span>':'')
+           + (it.tag==='rez'?'<span class="tag t-rez">REZERVASYON</span>':'')
+           + (it.tip?'<span class="tag t-warn">'+esc(it.tip)+'</span>':'')
+           + '<button class="own o'+it.own+'" data-own="'+di+'.'+ii+'">'+ownLbl(it.own)+'</button>'
+           + '<input class="cost" value="'+(it.cost||0)+'" data-p="days.'+di+'.items.'+ii+'.cost" data-num="1"> <span class="hint">₩ / kişi</span>'
+         +'</div>'
+       +'</div>'
+       +'<div class="acts">'
+         +'<button class="ib" data-mv="'+di+'.'+ii+'.-1">↑</button>'
+         +'<button class="ib" data-mv="'+di+'.'+ii+'.1">↓</button>'
+         +'<button class="ib del" data-del="'+di+'.'+ii+'">✕</button>'
+       +'</div></div>';
+    });
+    body+='<button class="btn sm" style="margin-top:10px" data-add="'+di+'">+ Satır ekle</button>';
+    body+='<div style="margin-top:12px"><div class="blk">Gün notu</div><input class="nt" style="font-size:13.5px" value="'+esc(day.note)+'" data-p="days.'+di+'.note"></div>';
+    body+='</div>';
+    el.innerHTML=head+body;
+    host.appendChild(el);
+  });
+}
+function ownLbl(o){ return ['— kim?', S.p1, S.p2, 'İkisi'][o]; }
+
+/* ---------- render: uyarılar ---------- */
+function renderWarn(){
+  const w=allWarnings();
+  const nd=new Set(w.map(x=>x.day)).size;
+  $('#wc').textContent=nd; $('#wc').className='cnt'+(nd?'':' zero');
+  let h='<h2>Tarih kontrolü</h2><p class="sub">Başlangıç tarihini yukarıdan seç — hangi güne ne denk geldiğini ve o gün nereye gidilemeyeceğini burada göreceksin.</p>';
+
+  if(!S.startDate){
+    h+='<div class="note w"><span class="nt-t">Henüz tarih girilmedi</span>Yukarıdaki <b>Başlangıç</b> kutusuna geliş tarihini yaz. Sistem 13 günün hangi haftanın gününe düştüğünü hesaplayıp <b>o gün kapalı olan durakları</b> tek tek listeleyecek.<br><br>Acelen yoksa aşağıdaki tabloya bak: hangi güne başlarsan kaç sorun çıktığını önceden hesapladım.</div>';
+  } else {
+    // gün bazlı sorun kartları
+    const byDay={};
+    w.forEach(x=>{ (byDay[x.day]=byDay[x.day]||[]).push(x.name); });
+    const keys=Object.keys(byDay).map(Number).sort((a,b)=>a-b);
+    if(!keys.length){
+      h+='<div class="note g"><span class="nt-t">✓ Bu tarihle gidilebilir</span>13 günün hiçbirinde kapalı mekâna denk gelmiyorsun. Yine de biletleri almadan önce resmî sayfalardan bir kez daha teyit et — kapanış günleri değişebiliyor.</div>';
+    } else {
+      h+='<div class="note b"><span class="nt-t">✕ '+keys.length+' günde sorun var</span>Aşağıdaki günlerde plandaki bazı duraklar <b>kapalı</b>. Her biri için ne yapman gerektiğini yazdım.</div>';
+      keys.forEach(k=>{
+        const day=S.days.find(d=>d.n===k), d=dateOf(k), isMon=d.getDay()===1;
+        h+='<div class="card" style="border-color:rgba(217,96,79,.45)">'
+          +'<h3 style="margin-top:0">Gün '+k+' — '+WD[d.getDay()]+' '+fmt(d)+' <span class="hint" style="font-weight:400">· '+esc(day.title)+'</span></h3>'
+          +'<div style="margin:8px 0"><b>Bu gün gidilemez:</b> '+byDay[k].map(n=>'<span class="tag t-shut" style="margin-right:5px">'+esc(n)+'</span>').join('')+'</div>'
+          +'<div style="font-size:13.5px;color:var(--dim)"><b style="color:var(--ink)">Ne yapmalı:</b> '
+          + (isMon
+             ? 'Bu gün <b>Pazartesi</b> — Kore’de müzelerin ve sarayların çoğu Pazartesi kapalı, yani burayı kurtarmak zor. İki yolu var: <b>(a)</b> başlangıç tarihini kaydır — aşağıdaki tabloda hangi günün temiz çıktığı yazıyor; <b>(b)</b> bu günü Pazartesi’ye dayanıklı bir günle takas et. Pazartesi çalışan tek günün <b>Hyundai/Kia/Seongsu</b> günü (showroom’lar açık) — ayrıca pazarlar, sur yürüyüşleri ve mahalle turları Pazartesi sorunsuz.'
+             : 'Başlangıç tarihini <b>1–2 gün kaydırmak</b> genelde yetiyor. Kaydırmak istemiyorsan bu günü, kapalı olmayan bir günle takas et ya da yalnızca kapalı durakları silip yerine aynı bölgeden başka bir şey koy.')
+          +'</div></div>';
+      });
+    }
+
+    // Seollal / yılbaşı kontrolü
+    const d1=dateOf(1), d13=dateOf(13);
+    const ov=(a,b2)=>!(d13<a||d1>b2);
+    if(ov(new Date('2027-02-05T12:00:00'), new Date('2027-02-10T12:00:00'))){
+      h+='<div class="note b"><span class="nt-t">✕ Seollal haftasına giriyorsun</span><b>Seollal 7 Şubat 2027</b>, resmî tatil <b>6–9 Şubat</b>. Yılın en yoğun seyahat haftası: KTX biletleri rezervasyon açıldığı gün tükeniyor, küçük lokantalar 1–3 gün kapanıyor, otobanlar kilitleniyor. <b>Tarihi 10 Şubat sonrasına ya da Ocak’a çek.</b><br><br>Tek tesellisi: o hafta <b>bütün saraylar ücretsiz</b> ve Seul boşalıyor.</div>';
+    }
+    if(ov(new Date('2026-12-31T12:00:00'), new Date('2027-01-01T12:00:00'))){
+      h+='<div class="note w"><span class="nt-t">⚠ Yılbaşına denk geliyor</span><b>1 Ocak</b> saraylar, müzeler ve çoğu kurum kapalı. 30 Aralık–2 Ocak arası otel fiyatları da yüksek. O günü Bosingak çan töreni veya mahalle yürüyüşü gibi kapanıştan etkilenmeyen bir programa ayır.</div>';
+    }
+  }
+
+  // ---- rezervasyon uyarıları ----
+  h+='<h2>Rezervasyon durumu</h2>';
+  if(!S.startDate){
+    h+='<p class="sub">Tarihi girince her rezervasyonun son alma tarihini hesaplayıp geciken varsa burada uyaracağım.</p>';
+  } else {
+    const bekleyen=[];
+    REZ.forEach(([id,days,kisa,txt])=>{
+      const st=S.rez[id]||{d:0,o:0}; if(st.d) return;
+      const kal=rezKalan(days), dd=rezDue(days);
+      if(kal===null) return;
+      bekleyen.push({id,days,kisa,kal,dd,o:st.o});
+    });
+    bekleyen.sort((a,b2)=>a.kal-b2.kal);
+    const gecikti=bekleyen.filter(x=>x.kal<0), yakin=bekleyen.filter(x=>x.kal>=0&&x.kal<=21);
+    if(!bekleyen.length){
+      h+='<div class="note g"><span class="nt-t">✓ Hepsi tamam</span>Rezervasyon listesindeki her şey işaretlenmiş.</div>';
+    } else {
+      if(gecikti.length) h+='<div class="note b"><span class="nt-t">✕ '+gecikti.length+' iş gecikti</span>Bunların ideal alma tarihi geçmiş. Hemen bak — özellikle KTX ve otel gecikince fiyat artıyor, Gizli Bahçe gibi kontenjanlılarda yer kalmayabiliyor.</div>';
+      else if(yakin.length) h+='<div class="note w"><span class="nt-t">⚠ '+yakin.length+' işin süresi yaklaşıyor</span>Önümüzdeki 3 hafta içinde halledilmesi gerekenler.</div>';
+      h+='<div class="tw"><table><thead><tr><th style="width:30%">İş</th><th>Son alma tarihi</th><th>Durum</th><th>Kim</th></tr></thead><tbody>';
+      bekleyen.slice(0,10).forEach(x=>{
+        const et = x.kal<0 ? '<span class="tag t-shut">'+Math.abs(x.kal)+' gün gecikti</span>'
+                 : x.kal<=21 ? '<span class="tag t-warn">'+x.kal+' gün kaldı</span>'
+                 : '<span class="tag t-rez">'+x.kal+' gün var</span>';
+        h+='<tr><td><b>'+esc(x.kisa)+'</b></td><td>'+fmt(x.dd)+' '+x.dd.getFullYear()+'</td><td>'+et+'</td><td class="hint">'+(x.o?ownLbl(x.o):'—')+'</td></tr>';
+      });
+      h+='</tbody></table></div>';
+      if(bekleyen.length>10) h+='<p class="hint">+'+(bekleyen.length-10)+' tane daha — tam liste Rezervasyon sekmesinde.</p>';
+    }
+    // plandaki rezervasyonlu duraklar
+    const rezDur=[];
+    S.days.forEach(day=>{ const d=dateOf(day.n); day.items.forEach(it=>{ if(it.tag==='rez') rezDur.push({n:day.n,d,name:it.name}); }); });
+    if(rezDur.length){
+      h+='<h3>Planda randevu/rezervasyon isteyen duraklar</h3><div class="tw"><table><thead><tr><th style="width:12%">Gün</th><th style="width:24%">Tarih</th><th>Durak</th></tr></thead><tbody>';
+      rezDur.forEach(x=>{ h+='<tr><td><b>Gün '+x.n+'</b></td><td>'+(x.d?WD[x.d.getDay()]+' '+fmt(x.d):'—')+'</td><td>'+esc(x.name)+'</td></tr>'; });
+      h+='</tbody></table></div>';
+      h+='<p class="hint">Bunların hepsi kapıdan girilmiyor — önceden yer ayırtmanız gerekiyor. Rezervasyon sekmesinden kimin yapacağını işaretleyin.</p>';
+    }
+  }
+
+  h+='<h2>Hangi güne başlasak?</h2><p class="sub">Aynı planı haftanın farklı günlerinde başlatınca kaç sorun çıkıyor. Plandaki güncel duraklardan canlı hesaplanıyor — bir durak silersen tablo da değişir. <b>Not:</b> "ayın 1. Pazartesi" gibi kurallar gerçek tarih gerektirdiği için bu tabloda değil, yukarıdaki tarih kontrolünde yakalanıyor.</p><div class="tw"><table><thead><tr><th>Başlangıç</th><th>Sorun</th><th>Nerede</th></tr></thead><tbody>'+startTable()+'</tbody></table></div>';
+  h+='<div class="note s"><span class="nt-t">★ Önerim — Salı başla, Gün 5 ile Gün 7’yi değiştir</span>'
+   +'Salı başlarsan Gün 7 <b>Pazartesi’ye</b> düşer. Pazartesi Kore’de müze katliamı — planında Pazartesi’ye dayanan tek gün <b>Suwon</b>: Samsung Innovation Museum yalnızca Pazar kapalı, Hwaseong surları zaten hep açık. O günü oraya taşıyınca sorun bitiyor.<br><br>'
+   +'<b>Ocak 2027’de sıfır sorun veren tarihler: 5, 12, 19 ve 26 Ocak</b> — hepsi Salı, hepsi Gün 5 ↔ Gün 7 takasıyla. '
+   +'<b>19 Ocak</b> en iyisi: yılbaşı fiyatlarından uzak, Hwacheon buz festivali penceresinin (9–31 Ocak) ortası.<br><br>'
+   +'<b>⚠ Bunun bedeli:</b> Suwon Pazartesi’ye düşünce Samsung’a <b>randevusuz giremezsiniz</b> — hafta içi 3 gün önceden rezervasyon şart. Cumartesi’deki serbest giriş avantajı kayboluyor.<br><br>'
+   +'<b>Motorstudio Goyang’ı silerseniz iş kolaylaşır:</b> Goyang <b>her Pazartesi</b> kapalı ve takvimi asıl sıkan o. Silerseniz Gün 6 ↔ Gün 7 takası yeter, Suwon da Cumartesi’de kalır — yani Samsung’a randevusuz girersiniz. Goyang’ı ne kadar istediğinize bağlı.<br><br>'
+   +'<button class="btn pri" id="do19">19 Ocak 2027 + Gün 5 ↔ Gün 7 takası</button> '
+   +'<button class="btn" id="doSwap">Sadece Gün 5 ↔ Gün 7 değiştir</button></div>';
+
+  $('#uyari').innerHTML=h;
+  const s1=$('#doSwap'); if(s1) s1.onclick=()=>{ swapDays(4,6); toast('Gün 5 ve 7 yer değiştirdi'); };
+  const s2=$('#do19'); if(s2) s2.onclick=()=>{ S.startDate='2027-01-19'; swapDays(4,6); toast('19 Ocak 2027 + takas uygulandı — sıfır sorun'); };
+}
+function startTable(){
+  let out='';
+  for(let st=0;st<7;st++){
+    const hits=[];
+    S.days.forEach(day=>{
+      const wd=(st+day.n-1)%7;
+      day.items.forEach(it=>{ if(it.cl && it.cl.includes(wd)) hits.push('G'+day.n+' '+it.name.replace(/^★ /,'').split(' —')[0].split(' ve ')[0]); });
+    });
+    const good=hits.length===0;
+    out+='<tr><td><b>'+WD[st]+'</b></td><td>'+(good?'<span class="tag t-free">TEMİZ</span>':'<span class="tag t-shut">'+hits.length+'</span>')+'</td><td class="hint">'+(hits.slice(0,6).join(' · ')||'—')+(hits.length>6?' …':'')+'</td></tr>';
+  }
+  return out;
+}
+function swapDays(i,j){
+  const a=S.days[i], b=S.days[j];
+  const ai={t:a.title,s:a.sub,c:a.city,it:a.items,nt:a.note};
+  a.title=b.title;a.sub=b.sub;a.city=b.city;a.items=b.items;a.note=b.note;
+  b.title=ai.t;b.sub=ai.s;b.city=ai.c;b.items=ai.it;b.note=ai.nt;
+  renderAll();
+}
+</script>
+
+<script>
+/* ---------- rezervasyon ---------- */
+const REZ=[
+ ['keta',90,'K-ETA başvurusu','<b>K-ETA</b> — Türk pasaportu için gerekli mi, k-eta.go.kr’den ve Kore Büyükelçiliği’nden teyit edin. <b>İKİNİZ AYRI AYRI başvuracaksınız.</b> Uçuştan en az 72 saat önce.'],
+ ['ucak',90,'Uçak bileti','Uçak bileti (İstanbul–Incheon). İki kişilik tek rezervasyonda alın ki koltuklar yan yana olsun.'],
+ ['otel1',60,'Seul oteli (7 gece)','Seul oteli — 7 gece, Jongno/Euljiro. <b>Twin oda</b> isteyin (Kore’de "double" tek yatak demek).'],
+ ['otel2',60,'Busan oteli (4 gece)','Busan oteli — 4 gece, Seomyeon.'],
+ ['otel3',60,'Seul son gece','Seul son gece — Gongdeok veya Hongdae (AREX hattı).'],
+ ['ktx1',30,'KTX Seul → Busan','<b>KTX Seul → Busan</b> (Gün 8, sabah erken). letskorail.com, yan yana koltuk. Satış penceresi genelde 1 ay önce açılıyor.'],
+ ['ktx2',30,'KTX Busan → Seul','<b>KTX Busan → Seul</b> (Gün 12).'],
+ ['huwon',30,'Changdeokgung Gizli Bahçe','<b>Changdeokgung Gizli Bahçe</b> — saatli ve kontenjanlı. ⚠ Satışın kaç gün önce açıldığını öğren; pencere kısa olabiliyor, açıldığı gün iki kişilik yer ayır.'],
+ ['jongmyo',30,'Jongmyo rehberli tur','<b>Jongmyo rehberli tur</b> — Cumartesi ve ayın son Çarşambası hariç zorunlu. Saat ve kontenjanı önceden öğren.'],
+ ['samsung',7,'Samsung Innovation Museum','<b>Samsung Innovation Museum</b> — hafta içi gidecekseniz <b>en az 3 gün önceden</b> rezervasyon; Cumartesi randevusuz. 031-200-3113'],
+ ['taksi',14,'Gyeongju yarım gün taksi','Gyeongju için yarım günlük taksi anlaşması — istasyondaki turizm danışmasından. İki kişiye bölününce ucuz.'],
+ ['esim',14,'eSIM (2 adet)','eSIM — <b>ikiniz için ayrı ayrı</b>. 10–15 gün sınırsız veri.'],
+ ['robot',30,'Robot & AI Müzesi','Robot &amp; AI Müzesi — <b>sadece plana geri eklerseniz</b> (Gün 13’ten çıkarıldı). yeyak.seoul.go.kr'],
+ ['seokguram',7,'Seokguram otobüs saatleri','Seokguram otobüs saatleri (12 numara, kışın seyrek) ve Gyeongju→Busan son otobüs saati.'],
+ ['kapanis',7,'Son kapanış kontrolü','Tüm kapanış günlerini kendi tarihinize göre son bir kez kontrol edin (Uyarılar sekmesi).']
+];
+function rezDue(days){
+  const d1=dateOf(1); if(!d1) return null;
+  const d=new Date(d1); d.setDate(d.getDate()-days); return d;
+}
+function rezKalan(days){
+  const d=rezDue(days); if(!d) return null;
+  const bugun=new Date(); bugun.setHours(12,0,0,0);
+  return Math.round((d-bugun)/86400000);
+}
+function whenLabel(days){ return days>=90?'3 AY ÖNCE':days>=60?'2 AY ÖNCE':days>=30?'1 AY ÖNCE':days>=14?'2 HAFTA ÖNCE':'1 HAFTA ÖNCE'; }
+
+function renderRez(){
+  let done=0;
+  let h='<h2>Rezervasyon listesi</h2><p class="sub">Kutucuğu işaretleyin, rozete tıklayıp kimin yapacağını atayın. <b>Başlangıç tarihini girerseniz</b> her işin son alma tarihini hesaplarım.</p><div class="card">';
+  REZ.forEach(([id,days,kisa,txt])=>{
+    const st=S.rez[id]||{d:0,o:0}; if(st.d)done++;
+    const dd=rezDue(days), kal=rezKalan(days);
+    let son='';
+    if(dd && !st.d){
+      const tarih=fmt(dd)+' '+dd.getFullYear();
+      son = kal<0 ? '<span class="tag t-shut">GECİKTİ — '+tarih+'</span>'
+          : kal<=14 ? '<span class="tag t-warn">'+kal+' gün kaldı · '+tarih+'</span>'
+          : '<span class="tag t-rez">'+tarih+' tarihine kadar</span>';
+    } else if(dd && st.d){ son='<span class="tag t-free">tamam</span>'; }
+    h+='<div class="chk'+(st.d?' done':'')+'">'
+      +'<input type="checkbox" data-rez="'+id+'"'+(st.d?' checked':'')+'>'
+      +'<div class="lb"><span class="when">'+whenLabel(days)+'</span>'+txt+' '+son+'</div>'
+      +'<button class="own o'+st.o+'" data-rezo="'+id+'">'+ownLbl(st.o)+'</button></div>';
+  });
+  h+='</div><div class="note'+(done===REZ.length?' g':'')+'"><span class="nt-t">Durum</span><b>'+done+' / '+REZ.length+'</b> tamamlandı.</div>';
+  h+='<h2>İki kişi olmanın getirdikleri</h2><div class="gr g2">'
+   +'<div class="card"><h3 style="margin-top:0">Lehinize</h3><ul class="cl">'
+   +'<li><b>Taksi ikiye bölünüyor.</b> Gyeongju yarım gün taksi ₩80.000–150.000 → kişi başı ₩40.000–75.000. Bulguksa/Seokguram otobüs derdini komple çözer.</li>'
+   +'<li><b>Twin oda</b> tek kişilikten çok az pahalı — gecelik ₩90.000 → kişi başı ₩45.000.</li>'
+   +'<li>Kore’de porsiyonlar iki kişilik; jjigae, samgyeopsal, dakgalbi tek kişiye çoğu yerde satılmıyor.</li>'
+   +'<li>Yongin gibi metro dışı noktalara taksi ekonomik hâle geliyor.</li></ul></div>'
+   +'<div class="card"><h3 style="margin-top:0">Dikkat</h3><ul class="cl">'
+   +'<li><b>KTX’te yan yana koltuk</b> otomatik gelmiyor — bileti tek işlemde, birlikte alın.</li>'
+   +'<li><b>Gizli Bahçe ve Jongmyo kontenjanlı</b> — iki kişilik yer kalmayabilir. Erken alın.</li>'
+   +'<li><b>K-ETA ve eSIM ikiniz için ayrı ayrı.</b></li>'
+   +'<li>Rozetlerden kim neyi yapacak işaretleyin; aynı bileti iki kez almayın.</li>'
+   +'<li>Jjimjilbang cinsiyete göre ayrı ve çıplak; ortak alanda üniformayla buluşuyorsunuz.</li></ul></div></div>';
+  $('#rez').innerHTML=h;
+}
+
+/* ---------- bütçe ---------- */
+const BLINES=[['ucak','Uçak bileti — 2 kişi toplam'],['otelSeul','Seul oteli — 7 gece (oda toplam)'],['otelBusan','Busan oteli — 4 gece (oda toplam)'],['otelSon','Seul son gece (oda toplam)'],['ktx1','KTX Seul→Busan — 2 kişi'],['ktx2','KTX Busan→Seul — 2 kişi'],['yemek','Yemek — 13 gün × 2 kişi'],['ulasim','Şehir içi ulaşım + taksi — 2 kişi'],['ekstra','Ekstra / hediyelik']];
+function itemsSum(){ let s=0; S.days.forEach(d=>d.items.forEach(i=>s+=(+i.cost||0))); return s; }
+function renderButce(){
+  const gir=itemsSum(), gir2=gir*2;
+  let fix=0; BLINES.forEach(([k])=>fix+=(+S.budget[k]||0));
+  const tot=fix+gir2;
+  let h='<h2>Bütçe — 2 kişi</h2><p class="sub">Plandaki ücretler otomatik toplanıyor (kişi başı girildi, 2 ile çarpılıyor). Diğer kalemleri elle düzenleyin.</p>';
+  h+='<div class="gr g3" style="margin-bottom:16px">'
+   +'<div class="stat"><div class="n">'+money(tot)+'</div><div class="l">TOPLAM (2 kişi)</div></div>'
+   +'<div class="stat"><div class="n">'+money(Math.round(tot/2))+'</div><div class="l">Kişi başı</div></div>'
+   +'<div class="stat"><div class="n">'+money(gir2)+'</div><div class="l">Giriş ücretleri (plandan)</div></div></div>';
+  h+='<div class="card">';
+  BLINES.forEach(([k,l])=>{ h+='<div class="bl"><div class="bn">'+l+'</div><input class="bv" value="'+(S.budget[k]||0)+'" data-b="'+k+'"> <span class="hint">₩</span></div>'; });
+  h+='<div class="bl"><div class="bn">Plandaki giriş/aktivite ücretleri <span class="hint">(otomatik)</span></div><div class="won">'+money(gir2)+'</div></div>';
+  h+='<div class="tot"><span>TOPLAM</span><span class="won">'+money(tot)+'</span></div>';
+  h+='<div class="tot" style="border:none;padding-top:6px;font-size:14px;color:var(--dim)"><span>Kişi başı</span><span class="won">'+money(Math.round(tot/2))+'</span></div>';
+  h+='</div>';
+  h+='<div class="note"><span class="nt-t">Referans fiyatlar</span>Orta segment otel kışın <b>₩70.000–120.000/gece</b> (oda) · KTX Seul–Busan <b>₩59.800/kişi</b> · öğün <b>₩8.000–15.000</b>, iyi bir akşam yemeği <b>₩25.000–40.000</b> · metro <b>~₩1.400</b> · taksi açılış <b>~₩4.800</b>. Kış, Seul dışında her yerde düşük sezon.</div>';
+  $('#butce').innerHTML=h;
+}
+
+function renderAll(){ renderDays(); renderWarn(); renderRez(); renderButce(); syncTop(); }
+function syncTop(){
+  $('#startDate').value=S.startDate||'';
+  $('#p1n').value=S.p1; $('#p2n').value=S.p2; $('#notes').value=S.notes;
+  const d1=dateOf(1), d13=dateOf(13);
+  $('#rangeTxt').textContent = d1? (fmt(d1)+' – '+fmt(d13)+' · 13 gün · 12 gece') : '13 gün · 12 gece — başlangıç tarihi seçilmedi';
+}
+
+/* ---------- path setter ---------- */
+function setPath(p,v){ const ks=p.split('.'); let o=S; for(let i=0;i<ks.length-1;i++) o=o[ks[i]]; o[ks[ks.length-1]]=v; }
+
+/* ---------- events ---------- */
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.p){ setPath(t.dataset.p, t.dataset.num? (parseInt(t.value.replace(/\D/g,''))||0) : t.value);
+    if(t.dataset.num) renderButce(); return; }
+  if(t.dataset.b){ S.budget[t.dataset.b]=parseInt(t.value.replace(/\D/g,''))||0; renderButce(); return; }
+  if(t.id==='p1n'){ S.p1=t.value; renderDays(); renderRez(); return; }
+  if(t.id==='p2n'){ S.p2=t.value; renderDays(); renderRez(); return; }
+  if(t.id==='notes'){ S.notes=t.value; return; }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='startDate'){ S.startDate=t.value; renderAll(); }
+  if(t.dataset.rez){ const id=t.dataset.rez; S.rez[id]=S.rez[id]||{d:0,o:0}; S.rez[id].d=t.checked?1:0; renderRez(); }
+});
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-t],[data-own],[data-mv],[data-del],[data-add],[data-rezo],.tab');
+  if(!t) return;
+  if(t.classList.contains('tab')){ $$('.tab').forEach(x=>x.classList.remove('on')); $$('.pg').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on'); $('#'+t.dataset.p).classList.add('on'); window.scrollTo({top:0,behavior:'smooth'}); return; }
+  if(t.dataset.t!==undefined){ const i=+t.dataset.t; S.days[i].open=!S.days[i].open; t.closest('.day').classList.toggle('op'); return; }
+  if(t.dataset.own){ const [di,ii]=t.dataset.own.split('.').map(Number); const it=S.days[di].items[ii]; it.own=(it.own+1)%4; t.className='own o'+it.own; t.textContent=ownLbl(it.own); return; }
+  if(t.dataset.rezo){ const id=t.dataset.rezo; S.rez[id]=S.rez[id]||{d:0,o:0}; S.rez[id].o=(S.rez[id].o+1)%4; renderRez(); return; }
+  if(t.dataset.mv){ const [di,ii,dir]=t.dataset.mv.split('.').map(Number); const a=S.days[di].items; const j=ii+dir;
+    if(j<0||j>=a.length) return; [a[ii],a[j]]=[a[j],a[ii]]; renderDays(); return; }
+  if(t.dataset.del){ const [di,ii]=t.dataset.del.split('.').map(Number); S.days[di].items.splice(ii,1); renderDays(); renderButce(); return; }
+  if(t.dataset.add){ const di=+t.dataset.add; S.days[di].items.push(I('','Yeni durak',{})); S.days[di].open=true; renderDays(); return; }
+});
+
+/* ---------- kaydet / yükle ---------- */
+function b64e(o){ const b=new TextEncoder().encode(JSON.stringify(o)); let s=''; b.forEach(x=>s+=String.fromCharCode(x)); return btoa(s); }
+function b64d(str){ const bin=atob(str.trim()); const b=Uint8Array.from(bin,c=>c.charCodeAt(0)); return JSON.parse(new TextDecoder().decode(b)); }
+$('#bSave').onclick=()=>{ const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kore-plan.json'; a.click(); toast('kore-plan.json indirildi — arkadaşına yolla'); };
+$('#bLoad').onclick=()=>$('#fIn').click();
+$('#fIn').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+  r.onload=()=>{ try{ const o=JSON.parse(r.result); if(!o.days) throw 0; S=o; S.rez=S.rez||{}; renderAll(); toast('Plan yüklendi'); }catch(err){ alert('Dosya okunamadı.'); } }; r.readAsText(f); };
+$('#bCode').onclick=async()=>{ const c=b64e(S); try{ await navigator.clipboard.writeText(c); toast('Kod kopyalandı ('+Math.round(c.length/1024)+' KB)'); }
+  catch(e){ prompt('Kopyalanamadı — elle kopyala:', c); } };
+$('#bPaste').onclick=()=>{ const c=prompt('Arkadaşının gönderdiği kodu yapıştır:'); if(!c) return;
+  try{ const o=b64d(c); if(!o.days) throw 0; S=o; S.rez=S.rez||{}; renderAll(); toast('Plan yüklendi'); }catch(e){ alert('Kod geçersiz.'); } };
+$('#bReset').onclick=()=>{ if(confirm('Tüm düzenlemeler silinip ilk hâline dönecek. Emin misin?')){ S=baseData(); renderAll(); toast('Sıfırlandı'); } };
+
+renderAll();
+</script>
+
+<!-- ================= GİRİŞ + CANLI SENKRON ================= -->
+<div class="gate" id="gate">
+  <div class="gatebox">
+    <div class="kicker" style="color:var(--ac);font-size:11px;letter-spacing:.2em;font-weight:800;margin-bottom:10px">KORE ORTAK PANEL</div>
+    <h2 style="margin:0 0 4px;font-size:22px">Giriş</h2>
+    <p class="hint" style="margin:0 0 18px">Bu plan sadece ikinize açık. Ortak parolayı girip kim olduğunu seç.</p>
+    <label class="glab">Parola</label>
+    <input type="password" id="gPass" class="ginp" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" placeholder="••••••••">
+    <label class="glab">Ben kimim?</label>
+    <div style="display:flex;gap:8px">
+      <button class="btn whobtn on" data-who="1" style="flex:1"></button>
+      <button class="btn whobtn" data-who="2" style="flex:1"></button>
+    </div>
+    <button class="btn pri" id="gBtn" style="width:100%;margin-top:14px;padding:10px">Gir</button>
+    <div id="gErr" class="gerr"></div>
+    <div class="hint" style="margin-top:14px;font-size:12px">Parolayı unuttuysan Firebase konsolundan (Authentication → Users) sıfırlayabilirsin. İnternet yoksa giriş yapılamaz — o durumda planı <b>Yükle</b> ile dosyadan açabilirsin.</div>
+    <button class="btn" id="gTest" style="width:100%;margin-top:10px">Kurulumu test et</button>
+    <button class="btn" id="gSkip" style="width:100%;margin-top:8px">Girişsiz devam et (çevrimdışı)</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const FB_CONFIG = {
+  apiKey: "AIzaSyDnMg9aoNvGLo9b_QzMwPsKD5jKztD0puM",
+  authDomain: "kore-plani.firebaseapp.com",
+  projectId: "kore-plani",
+  storageBucket: "kore-plani.firebasestorage.app",
+  messagingSenderId: "121485303349",
+  appId: "1:121485303349:web:2d847ea80cb1adb4469b7c"
+};
+const ODA = 'ana';
+const HESAP = 'kore@plan.local';   // sabit kullanıcı adı — gizli değil, parola koruyor   // tek ortak doküman — erişim kurallarla iki hesaba kilitli
+
+let db=null, docRef=null, unsub=null, me=null, whoIdx=1, lastTyped=0, saveTimer=null, applying=false, pendingRemote=null, connected=false;
+
+function gErr(m){ const e=document.getElementById('gErr'); if(e){ e.textContent=m; e.style.display=m?'block':'none'; } }
+function closeGate(){ const g=document.getElementById('gate'); if(g) g.style.display='none'; }
+
+function syncBar(){
+  const host=document.getElementById('syncbar'); if(!host) return;
+  if(!FB_CONFIG || !FB_CONFIG.apiKey){
+    host.innerHTML='<span class="sdot off"></span><span class="hint">Canlı senkron kapalı — Firebase ayarı yok. Kaydet/Yükle ile dosya alışverişi yapabilirsiniz.</span>'; return;
+  }
+  if(!connected){
+    host.innerHTML='<span class="sdot off"></span><span class="hint">Çevrimdışı — değişiklikler paylaşılmıyor. Kaydet/Yükle ile dosya alışverişi yapabilirsiniz.</span>'
+      +' <button class="btn sm" id="bLogin">Giriş yap</button>';
+    const b=document.getElementById('bLogin'); if(b) b.onclick=()=>{ const g=document.getElementById('gate'); if(g) g.style.display='flex'; };
+  } else {
+    host.innerHTML='<span class="sdot on"></span><b style="font-size:13px">Canlı</b>'
+      +'<span class="hint">· '+esc(me||'')+'</span>'
+      +'<span class="hint" id="syncInfo">bağlandı</span>'
+      +'<button class="btn sm" id="bOut">Çıkış</button>';
+    const b=document.getElementById('bOut'); if(b) b.onclick=signOut;
+  }
+}
+function sInfo(t){ const e=document.getElementById('syncInfo'); if(e) e.textContent='· '+t; }
+
+async function doLogin(){
+  const pw=(document.getElementById('gPass').value||'').trim();   // telefonda yapıştırınca sona boşluk geliyor
+  if(!pw){ gErr('Parolayı gir.'); return; }
+  if(location.protocol==='file:'){
+  const w=document.createElement('div'); w.className='gerr'; w.style.display='block';
+  w.style.borderLeftColor='var(--warn)'; w.style.background='rgba(224,163,62,.12)'; w.style.color='#e8bd6e';
+  w.innerHTML='⚠ Bu dosya <b>indirilmiş dosya olarak</b> açıldı (file://). Bilgisayarda genelde sorun olmaz ama <b>telefonda giriş çalışmayabilir</b> — Firebase bu şekilde açılan sayfalara güvenmiyor. Telefonda kullanacaksanız dosyanın internete konması gerekiyor.';
+  const box=document.querySelector('.gatebox'); if(box) box.appendChild(w);
+}
+if(typeof firebase==='undefined'){ gErr('Firebase kütüphanesi yüklenemedi. İnternet bağlantını, güvenlik duvarını ve reklam engelleyicini kontrol et.'); return; }
+  gErr(''); const btn=document.getElementById('gBtn'); btn.textContent='Giriliyor…'; btn.disabled=true;
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+    await firebase.auth().signInWithEmailAndPassword(HESAP,pw);
+    me = (whoIdx===2 ? (S.p2||'Kişi 2') : (S.p1||'Kişi 1'));
+    await startSync();
+    closeGate(); toast('Giriş yapıldı — canlı senkron açık');
+  }catch(e){
+    const c=(e&&e.code)||'';
+    let m='Giriş yapılamadı: '+(c||e.message);
+    if(e&&e.__fs){
+      m = (c.indexOf('permission-denied')>=0)
+        ? 'Parola doğru, giriş yapıldı — ama Firestore kuralları izin vermiyor. Rules’daki UID’yi kontrol et: Authentication → Users’daki User UID ile birebir aynı olmalı. Ayrıca kuralları YAYINLA’ya bastığından emin ol.'
+        : (c.indexOf('not-found')>=0 ? 'Giriş yapıldı ama Firestore veritabanı yok. Build → Firestore Database → Veritabanı oluştur.' : 'Giriş yapıldı ama veritabanına erişilemedi: '+(c||e.message));
+    }
+    if(c.indexOf('invalid-credential')>=0||c.indexOf('wrong-password')>=0) m='Parola hatalı.';
+    else if(c.indexOf('user-not-found')>=0) m='Kullanıcı bulunamadı. Firebase → Authentication → Users’da '+HESAP+' adıyla kullanıcı oluşturulmuş mu?';
+    else if(c.indexOf('too-many-requests')>=0) m='Çok fazla deneme yapıldı, biraz bekle.';
+    else if(c.indexOf('operation-not-allowed')>=0) m='Firebase’de E-posta/Parola girişi etkin değil. Authentication → Sign-in method → Email/Password → Etkinleştir.';
+    else if(c.indexOf('network')>=0) m='Ağ hatası. İnternet yok ya da dosya file:// ile açıldığı için engellendi — dosyayı bir yere yükleyip https ile açmayı dene.';
+    gErr(m + (c ? '\n\n[hata kodu: '+c+']' : ''));
+    const el=document.getElementById('gErr'); if(el) el.style.whiteSpace='pre-line';
+  }finally{ btn.textContent='Gir'; btn.disabled=false; }
+}
+async function signOut(){
+  try{ if(unsub){unsub();unsub=null;} await firebase.auth().signOut(); }catch(e){}
+  connected=false; me=null; docRef=null; syncBar();
+  const g=document.getElementById('gate'); if(g) g.style.display='flex';
+}
+
+async function startSync(){
+  db=firebase.firestore();
+  try{
+  docRef=db.collection('planlar').doc(ODA);
+  const snap=await docRef.get();
+  if(!snap.exists){ await docRef.set({data:JSON.stringify(S), by:me, at:Date.now()}); }
+  else { applyRemote(snap.data()); }
+  if(unsub) unsub();
+  unsub=docRef.onSnapshot(d=>{
+    if(!d.exists||d.metadata.hasPendingWrites) return;
+    const r=d.data();
+    if(Date.now()-lastTyped < 3000){ pendingRemote=r; showMerge(r); return; }
+    applyRemote(r);
+  }, e=>{ sInfo('bağlantı hatası: '+(e.code||e.message)); });
+  connected=true; syncBar();
+  }catch(e){ e.__fs=true; throw e; }
+}
+
+function applyRemote(r){
+  try{
+    const o=JSON.parse(r.data);
+    if(JSON.stringify(o)===JSON.stringify(S)) return;
+    applying=true; S=o; S.rez=S.rez||{}; renderAll(); applying=false;
+    const t=r.at? new Date(r.at):null;
+    sInfo('güncelledi: '+(r.by||'?')+(t? ' · '+t.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}):''));
+    const b=document.getElementById('mergebar'); if(b) b.style.display='none';
+  }catch(e){ sInfo('gelen veri okunamadı'); }
+}
+function showMerge(r){
+  let b=document.getElementById('mergebar');
+  if(!b){ b=document.createElement('div'); b.id='mergebar'; b.className='mergebar'; document.body.appendChild(b); }
+  b.style.display='flex';
+  b.innerHTML='<span><b>'+esc(r.by||'Arkadaşın')+'</b> aynı anda değişiklik yaptı.</span>'
+    +'<button class="btn sm" id="mTake">Onunkini al</button><button class="btn sm" id="mKeep">Benimkini gönder</button>';
+  document.getElementById('mTake').onclick=()=>applyRemote(pendingRemote);
+  document.getElementById('mKeep').onclick=()=>{ b.style.display='none'; pushNow(); };
+}
+function touch(){
+  if(applying) return; lastTyped=Date.now();
+  if(!connected) return;
+  clearTimeout(saveTimer); sInfo('yazılıyor…'); saveTimer=setTimeout(pushNow,1200);
+}
+async function pushNow(){
+  if(!connected||!docRef) return;
+  try{ await docRef.set({data:JSON.stringify(S), by:me||'?', at:Date.now()});
+       sInfo('kaydedildi · '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}));
+  }catch(e){
+    const c=(e&&e.code)||'';
+    sInfo(c.indexOf('permission-denied')>=0 ? 'yazma izni yok — kurallardaki UID’leri kontrol et' : 'kaydedilemedi: '+(c||e.message));
+  }
+}
+document.addEventListener('input',touch);
+document.addEventListener('change',touch);
+document.addEventListener('click',e=>{ if(e.target.closest('[data-own],[data-mv],[data-del],[data-add],[data-rezo],#do19,#doSwap')) touch(); });
+
+function paintWho(){
+  document.querySelectorAll('.whobtn').forEach(b=>{
+    const i=+b.dataset.who;
+    b.textContent = i===1 ? (S.p1||'Kişi 1') : (S.p2||'Kişi 2');
+    b.classList.toggle('on', i===whoIdx);
+  });
+}
+document.querySelectorAll('.whobtn').forEach(b=>{
+  b.onclick=()=>{ whoIdx=+b.dataset.who; paintWho(); };
+});
+paintWho();
+document.getElementById('gBtn').onclick=doLogin;
+setTimeout(()=>{const g=document.getElementById('gPass'); if(g) g.focus();},200);
+document.getElementById('gPass').onkeydown=e=>{ if(e.key==='Enter') doLogin(); };
+document.getElementById('gTest').onclick=async ()=>{
+  gErr('');
+  const b=document.getElementById('gTest'); b.textContent='Test ediliyor…'; b.disabled=true;
+  const rapor=[];
+  try{
+    if(typeof firebase==='undefined') throw {code:'sdk'};
+    if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+    rapor.push('✓ Firebase kütüphanesi yüklendi');
+    try{
+      await firebase.auth().signInWithEmailAndPassword(HESAP,'tanilama-icin-kasitli-yanlis-parola-9182');
+      rapor.push('? Beklenmedik: yanlış parola kabul edildi');
+    }catch(e){
+      const c=(e&&e.code)||'';
+      if(c.indexOf('operation-not-allowed')>=0){ rapor.push('✕ E-posta/Parola girişi KAPALI → Authentication → Sign-in method → Email/Password → Etkinleştir'); }
+      else if(c.indexOf('api-key-not-valid')>=0||c.indexOf('invalid-api-key')>=0){ rapor.push('✕ API anahtarı geçersiz → dosyadaki Firebase ayarlarını kontrol et'); }
+      else if(c.indexOf('network')>=0){ rapor.push('✕ Ağ hatası → internet yok, ya da dosya file:// ile açıldığı için engellendi. Dosyayı bir yere yükleyip https ile açmayı dene.'); }
+      else if(c.indexOf('too-many-requests')>=0){ rapor.push('⚠ Çok fazla deneme yapıldı, birkaç dakika bekle'); }
+      else if(c.indexOf('user-not-found')>=0){ rapor.push('✕ '+HESAP+' adlı kullanıcı YOK → Authentication → Users → Add user'); }
+      else if(c.indexOf('invalid-credential')>=0||c.indexOf('wrong-password')>=0){
+        rapor.push('✓ E-posta/Parola girişi açık ve API anahtarı çalışıyor');
+        rapor.push('→ Sıra sende: doğru parolayı yazıp Gir’e bas.');
+        rapor.push('Not: Firebase güvenlik gereği "kullanıcı yok" ile "parola yanlış" hatasını ayırmıyor. Gir’de de aynı hatayı alırsan '+HESAP+' kullanıcısının oluşturulduğunu kontrol et.');
+      }
+      else rapor.push('? Beklenmedik hata: '+(c||e.message));
+    }
+  }catch(e){
+    rapor.push((e&&e.code)==='sdk' ? '✕ Firebase kütüphanesi yüklenemedi → internet / güvenlik duvarı / reklam engelleyici' : '✕ '+(e.message||e));
+  }
+  b.textContent='Kurulumu test et'; b.disabled=false;
+  gErr(rapor.join('\n'));
+  const el=document.getElementById('gErr'); if(el){ el.style.whiteSpace='pre-line'; el.style.color='var(--ink)'; }
+};
+document.getElementById('gSkip').onclick=()=>{ closeGate(); syncBar(); toast('Çevrimdışı mod — değişiklikler paylaşılmıyor'); };
+if(location.protocol==='file:'){
+  const w=document.createElement('div'); w.className='gerr'; w.style.display='block';
+  w.style.borderLeftColor='var(--warn)'; w.style.background='rgba(224,163,62,.12)'; w.style.color='#e8bd6e';
+  w.innerHTML='⚠ Bu dosya <b>indirilmiş dosya olarak</b> açıldı (file://). Bilgisayarda genelde sorun olmaz ama <b>telefonda giriş çalışmayabilir</b> — Firebase bu şekilde açılan sayfalara güvenmiyor. Telefonda kullanacaksanız dosyanın internete konması gerekiyor.';
+  const box=document.querySelector('.gatebox'); if(box) box.appendChild(w);
+}
+if(typeof firebase==='undefined'){ gErr('Firebase kütüphanesi yüklenemedi — internet bağlantını kontrol et. Çevrimdışı devam edebilirsin.'); }
+syncBar();
+</script>
+</body></html>
