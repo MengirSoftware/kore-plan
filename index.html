@@ -99,6 +99,12 @@ section.pg.on{display:block}
 .ib{background:none;border:1px solid var(--ln);color:var(--dim);border-radius:6px;width:24px;height:24px;font-size:12px;cursor:pointer;padding:0;line-height:1}
 .ib:hover{color:var(--ac);border-color:var(--ac)}
 .ib.del:hover{color:var(--bad);border-color:var(--bad)}
+.dh .acts{opacity:1}
+.ib.edt{color:var(--ac);border-color:var(--ac);opacity:.85}
+.ib.edt:hover{background:var(--ac);color:#0d0f13;opacity:1}
+.card.dedit{border-color:rgba(120,170,255,.35)}
+.card.dedit.flash{animation:fl 1.6s ease-out 1}
+@keyframes fl{0%{box-shadow:0 0 0 0 rgba(120,170,255,.55);border-color:var(--ac)}70%{box-shadow:0 0 0 10px rgba(120,170,255,0)}100%{box-shadow:none}}
 
 .card{background:var(--pn);border:1px solid var(--ln);border-radius:13px;padding:18px;margin:14px 0}
 .note{border-left:3px solid var(--ac2);background:rgba(74,157,156,.07);padding:11px 14px;border-radius:0 9px 9px 0;margin:12px 0;font-size:13.8px}
@@ -382,14 +388,15 @@ function renderDays(){
       + '<span class="hint">'+esc(day.sub)+'</span>'
       +'</div></div>'
       +'<div class="acts" style="opacity:.5;margin-top:2px">'
+        +'<button class="ib edt" data-dedit="'+di+'" title="günü düzenle (başlık, alt başlık, şehir)">✎</button>'
         +'<button class="ib" data-dmv="'+di+'.-1" title="yukarı taşı">↑</button>'
         +'<button class="ib" data-dmv="'+di+'.1" title="aşağı taşı">↓</button>'
         +'<button class="ib del" data-ddel="'+di+'" title="günü sil">✕</button>'
       +'</div>'
       +'<div class="car">▶</div></div>';
     let body='<div class="db">';
-    body+='<div class="card tight" style="margin:0 0 12px">'
-      +'<div class="blk" style="margin-top:0">Günün kendisi</div>'
+    body+='<div class="card tight dedit" id="dedit'+di+'" style="margin:0 0 12px">'
+      +'<div class="blk" style="margin-top:0">✎ Günü düzenle</div>'
       +'<input class="nm" style="font-size:15.5px" value="'+esc(day.title)+'" placeholder="Gün başlığı" data-p="days.'+di+'.title" data-re="1">'
       +'<input class="nt" value="'+esc(day.sub)+'" placeholder="Alt başlık — bu gün ne üzerine?" data-p="days.'+di+'.sub" data-re="1">'
       +'<div style="display:flex;gap:10px;align-items:center;margin-top:6px">'
@@ -741,8 +748,23 @@ document.addEventListener('change',e=>{
   if(t.dataset.rez){ const id=t.dataset.rez; S.rez[id]=S.rez[id]||{d:0,o:0}; S.rez[id].d=t.checked?1:0; renderRez(); }
 });
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-dmv],[data-ddel],[data-lnkadd],[data-lnkdel],[data-gadd],[data-gdel],[data-t],[data-own],[data-mv],[data-del],[data-add],[data-rezo],.tab');
+  const t=e.target.closest('[data-dedit],[data-dmv],[data-ddel],[data-lnkadd],[data-lnkdel],[data-gadd],[data-gdel],[data-t],[data-own],[data-mv],[data-del],[data-add],[data-rezo],.tab');
   if(!t) return;
+  if(t.dataset.dedit!==undefined){
+    e.stopPropagation();
+    const di=+t.dataset.dedit;
+    S.days[di].open=true;
+    renderDays();
+    const box=document.getElementById('dedit'+di);
+    if(box){
+      box.classList.add('flash');
+      box.scrollIntoView({behavior:'smooth',block:'center'});
+      const inp=box.querySelector('input');
+      if(inp){ setTimeout(()=>{ inp.focus(); inp.select(); },250); }
+      setTimeout(()=>box.classList.remove('flash'),1800);
+    }
+    return;
+  }
   if(t.dataset.dmv!==undefined){
     e.stopPropagation();
     const [di,dir]=t.dataset.dmv.split('.').map(Number), j=di+dir;
@@ -922,6 +944,7 @@ async function startSync(){
   unsub=docRef.onSnapshot(d=>{
     if(!d.exists||d.metadata.hasPendingWrites) return;
     const r=d.data();
+    try{ if(r && r.data && r.data===JSON.stringify(S)) return; }catch(e){}
     if(Date.now()-lastTyped < 3000){ pendingRemote=r; showMerge(r); return; }
     applyRemote(r);
   }, e=>{ sInfo('bağlantı hatası: '+(e.code||e.message)); });
@@ -930,13 +953,14 @@ async function startSync(){
 }
 
 function applyRemote(r){
+  const bar=document.getElementById('mergebar'); if(bar) bar.style.display='none';
+  if(!r||!r.data) return;
   try{
     const o=JSON.parse(r.data);
     if(JSON.stringify(o)===JSON.stringify(S)) return;
     applying=true; S=o; S.rez=S.rez||{}; renderAll(); applying=false;
     const t=r.at? new Date(r.at):null;
     sInfo('güncelledi: '+(r.by||'?')+(t? ' · '+t.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}):''));
-    const b=document.getElementById('mergebar'); if(b) b.style.display='none';
   }catch(e){ sInfo('gelen veri okunamadı'); }
 }
 function showMerge(r){
@@ -945,8 +969,20 @@ function showMerge(r){
   b.style.display='flex';
   b.innerHTML='<span><b>'+esc(r.by||'Arkadaşın')+'</b> aynı anda değişiklik yaptı.</span>'
     +'<button class="btn sm" id="mTake">Onunkini al</button><button class="btn sm" id="mKeep">Benimkini gönder</button>';
-  document.getElementById('mTake').onclick=()=>applyRemote(pendingRemote);
-  document.getElementById('mKeep').onclick=()=>{ b.style.display='none'; pushNow(); };
+  document.getElementById('mTake').onclick=async ()=>{
+    clearTimeout(saveTimer);        // kendi bekleyen kaydımı iptal et — yoksa üstüne yazıyor
+    lastTyped=0;                    // "az önce yazdım" durumundan çık
+    const secilen=pendingRemote;
+    applyRemote(secilen);
+    await pushNow();                // sunucuyu da onun sürümüne sabitle
+    toast((secilen&&secilen.by? secilen.by : 'Arkadaşının')+' sürümü alındı');
+  };
+  document.getElementById('mKeep').onclick=async ()=>{
+    b.style.display='none';
+    clearTimeout(saveTimer); lastTyped=0;
+    await pushNow();
+    toast('Senin sürümün gönderildi');
+  };
 }
 function touch(){
   if(applying) return; lastTyped=Date.now();
